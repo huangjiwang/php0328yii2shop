@@ -1,17 +1,32 @@
 <?php
 namespace backend\controllers;
 
+use yii\data\Pagination;
 use yii\web\Controller;
 use backend\models\ArticleCategory;
 use yii\web\Request;
 
 class ArticleCategoryController extends Controller
 {
-    //显示
+    //显示\分页
     public function actionIndex()
     {
-        $ArticleCategory = ArticleCategory::find()->where(['or', 'status=1', 'status=0'])->all();
-        return $this->render('index', ['rows' => $ArticleCategory]);
+        $ArticleCategory = ArticleCategory::find()->where(['or', 'status=1', 'status=0']);
+        //获取总条数
+        //var_dump($ArticleCategory);exit;
+        $total = $ArticleCategory->count();
+        //每页显示多少条
+        $perPage=3;
+        //分页工具类
+        $pager=new Pagination(
+            [
+                'totalCount'=>$total,
+                'defaultPageSize'=>$perPage
+            ]
+        );
+        $ArticleCategory->orderBy('sort ASC');   // 排序
+        $students = $ArticleCategory->limit($pager->limit)->offset($pager->offset)->all();
+        return $this->render('index', ['students'=>$students,'pager'=>$pager]);
     }
 
     //添加
@@ -27,7 +42,7 @@ class ArticleCategoryController extends Controller
             if($model->validate()){
                 $model->save();
                 //跳转到列表页
-                return $this->redirect(['ArticleCategory/index']);
+                return $this->redirect(['article-category/index']);
             }else{
                 var_dump($model->getErrors());exit;
             }
@@ -44,7 +59,7 @@ class ArticleCategoryController extends Controller
             $model->load($request->post());
             if($model->validate()){
                 $model->save();
-                return $this->redirect(['ArticleCategory/index']);
+                return $this->redirect(['article-category/index']);
             }else{
                 var_dump($model->getErrors());exit;
             }
@@ -58,7 +73,7 @@ class ArticleCategoryController extends Controller
         $model->status=-1;
         $model->save(false);
         //var_dump($brand->status);exit;
-        return $this->redirect(['ArticleCategory/index']);
+        return $this->redirect(['article-category/index']);
     }
 
 

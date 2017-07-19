@@ -19,6 +19,7 @@ class Brand extends ActiveRecord{
         return[
             ['imgFile','file','extensions'=>['jpg','png','gif']],
             [['name','intro','logo','sort','status'],'safe'],
+            [['name','intro','sort','status'],'required'],
         ];
     }
 

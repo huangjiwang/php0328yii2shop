@@ -17,6 +17,7 @@ class ArticleCategory extends ActiveRecord{
     public function rules(){
         return[
             [['name','intro','sort','status'],'safe'],
+            [['name','intro','sort','status'],'required'],
         ];
     }
 
