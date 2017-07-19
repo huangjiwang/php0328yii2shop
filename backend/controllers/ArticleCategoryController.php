@@ -13,7 +13,6 @@ class ArticleCategoryController extends Controller
     {
         $ArticleCategory = ArticleCategory::find()->where(['or', 'status=1', 'status=0']);
         //获取总条数
-        //var_dump($ArticleCategory);exit;
         $total = $ArticleCategory->count();
         //每页显示多少条
         $perPage=3;

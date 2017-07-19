@@ -1,8 +1,9 @@
 <?php
 namespace backend\models;
+
 use yii\db\ActiveRecord;
 
-class ArticleCategory extends ActiveRecord{
+class Article extends ActiveRecord{
     public static   $options=[-1=>'删除',0=>'隐藏',1=>'正常'];
     //状态
     public static function getStatusOptions($hidden_del=true)
@@ -12,27 +13,24 @@ class ArticleCategory extends ActiveRecord{
         }
         return self::$options;
     }
-    public function getArticleCategory()
+    public function getCategory()
     {
-        return $this->hasMany(Article::className(),['id'=>'id']);
+        return $this->hasOne(ArticleCategory::className(),['id'=>'article_category_id']);//hasOne 返回一个对象
     }
-
     public function rules(){
         return[
-            [['name','intro','sort','status'],'safe'],
+            [['name','intro','article_category_id','sort','status'],'safe'],
             [['name','intro','sort','status'],'required'],
         ];
     }
-
     public function attributeLabels(){
         return [
             'name'=>'名称',
             'intro'=>'简介',
+            'article_category_id'=>'文章分类',
             'sort'=>'排序',
             'status'=>'状态',
+            'create_time'=>'创建时间',
         ];
-    }
-    public static function tableName(){
-        return 'article_category';
     }
 }
