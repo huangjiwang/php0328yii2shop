@@ -2,7 +2,7 @@
 namespace backend\models;
 use yii\db\ActiveRecord;
 
-class article_category extends ActiveRecord{
+class ArticleCategory extends ActiveRecord{
     public static   $options=[-1=>'删除',0=>'隐藏',1=>'正常'];
     //状态
     public static function getStatusOptions($hidden_del=true)
@@ -27,5 +27,8 @@ class article_category extends ActiveRecord{
             'sort'=>'排序',
             'status'=>'状态',
         ];
+    }
+    public static function tableName(){
+        return 'article_category';
     }
 }
