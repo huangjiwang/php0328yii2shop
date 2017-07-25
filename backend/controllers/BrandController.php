@@ -1,5 +1,6 @@
 <?php
 namespace backend\controllers;
+use app\models\Upload;
 use backend\models\Brand;
 use yii\data\Pagination;
 use yii\web\Controller;
@@ -35,30 +36,15 @@ class BrandController extends Controller{
         //判断是否以post方式提交
         if($requerst->isPost){
             $brand->load($requerst->post());
-            $brand->imgFile=UploadedFile::getInstance($brand,'imgFile');
             //验证数据
-            if($brand->validate()) {
-                //文件上传
-                if ($brand->imgFile) {
-                    $d = \Yii::getAlias('@webroot') . '/upload/' . date('Ymd');
-                    if (!is_dir($d)) {
-                        mkdir($d,0777,true);
-                    }
-                    $fileName = '/upload/' . date('Ymd') . '/' . uniqid() . '.' . $brand->imgFile->extension;
-                    //创建文件夹
-                    $brand->imgFile->saveAs(\Yii::getAlias('@webroot') . $fileName, false);
-
-                    $brand->logo= $fileName;
-                }
-                $brand->save(false);
+            if($brand->validate() &&  $brand->save(false)) {
                 return $this->redirect(['brand/index']);
             }else{
-                //验证失败 打印错误信息
+                //验证或保存失败
                 var_dump($brand->getErrors());exit;
             }
         }
         //调用视图并传值
-
         return $this->render('add',['brand'=>$brand]);
     }
 
@@ -69,26 +55,11 @@ class BrandController extends Controller{
         $requerst=new Request();
         //判断是否以post方式提交
         if($requerst->isPost){
-            $brand->load($requerst->post());
-            $brand->imgFile=UploadedFile::getInstance($brand,'imgFile');
             //验证数据
-            if($brand->validate()) {
-                //文件上传
-                if ($brand->imgFile) {
-                    $d = \Yii::getAlias('@webroot') . '/upload/' . date('Ymd');
-                    if (!is_dir($d)) {
-                        mkdir($d,0777,true);
-                    }
-                    $fileName = '/upload/' . date('Ymd') . '/' . uniqid() . '.' . $brand->imgFile->extension;
-                    //创建文件夹
-                    $brand->imgFile->saveAs(\Yii::getAlias('@webroot') . $fileName, false);
-
-                    $brand->logo= $fileName;
-                }
-                $brand->save(false);
+            if( $brand->load($requerst->post()) && $brand->validate() &&  $brand->save(false)) {
                 return $this->redirect(['brand/index']);
             }else{
-                //验证失败 打印错误信息
+                //验证或保存失败
                 var_dump($brand->getErrors());exit;
             }
         }

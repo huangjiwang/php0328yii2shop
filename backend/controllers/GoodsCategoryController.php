@@ -8,12 +8,11 @@ use yii\web\Controller;
 use yii\web\HttpException;
 
 class GoodsCategoryController extends Controller{
-    //添加商品分类（ztree选择上级分类id）
+    //添加商品分类
     public function actionAdd()
     {
         $model = new GoodsCategory(['parent_id'=>0]);
         if($model->load(\Yii::$app->request->post()) && $model->validate()){
-            //$model->save();
             //判断是否是添加一级分类
             if($model->parent_id){
                 //非一级分类
@@ -46,7 +45,7 @@ class GoodsCategoryController extends Controller{
     public function actionEdit($id){
         $model=GoodsCategory::findOne(['id'=>$id]);
         if($model->load(\Yii::$app->request->post()) && $model->validate()){
-            //$model->save();
+
             //判断是否是添加一级分类
             if($model->parent_id){
                 //非一级分类
@@ -57,10 +56,14 @@ class GoodsCategoryController extends Controller{
                     throw new HttpException(404,'上级分类不存在');
                 }
             }else{
-                //一级分类
-                $model->makeRoot();
+                if($model->oldAttributes['parent_id']==0){
+                    $model->save();
+                }else{
+                    //一级分类
+                    $model->makeRoot();
+                }
             }
-            \Yii::$app->session->setFlash('success','分类添加成功');
+            \Yii::$app->session->setFlash('success','分类修改成功');
             return $this->redirect(['index']);
         }
         //获取所以分类数据

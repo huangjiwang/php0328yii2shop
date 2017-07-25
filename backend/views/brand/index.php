@@ -15,7 +15,7 @@
             <td><?=$row->id?></td>
             <td><?=$row->name?></td>
             <td><?=$row->intro?></td>
-            <td><?=\yii\bootstrap\Html::img($row->logo?$row->logo:'/upload/1.jpg',['height'=>50])?></td>
+           <td><?=\yii\helpers\Html::img($row->logo?Yii::$app->params['imgUrl'].$row->logo:false,['id'=>'logo-img','style'=>'width:100px'])?></td>
             <td><?=$row->sort?></td>
             <td><?=\backend\models\Brand::$options[$row->status]?></td>
             <td>

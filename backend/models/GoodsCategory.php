@@ -21,7 +21,10 @@ class GoodsCategory extends ActiveRecord{
             'intro'=>'简介',
         ];
     }
-
+    public function getGoodsCategory()
+    {
+        return $this->hasMany(Goods::className(),['id'=>'id']);
+    }
     public static function tableName(){
         return 'goods_category';
     }
