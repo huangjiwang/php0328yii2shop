@@ -66,4 +66,14 @@ class MenuController extends Controller{
         \Yii::$app->session->setFlash('success','删除成功');
         return $this->redirect(['menu/index']);
     }
+
+
+    //设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
 }

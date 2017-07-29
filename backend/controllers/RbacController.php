@@ -183,14 +183,14 @@ class RbacController extends Controller
         //添加成功跳转到显示的方法
         return $this->redirect(['rbac/index-role']);
     }
-//    //设置路由权限
-//    public function behaviors(){
-//        return[
-//            'rbac'=>[
-//                'class'=>RbacFilter::className(),
-//            ]
-//        ];
-//    }
+    //设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
 }
 
 
