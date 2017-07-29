@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2017/7/24
- * Time: 14:33
- */
 
 namespace backend\controllers;
 
 
+use backend\filters\RbacFilter;
+use backend\models\GoodsGallery;
 use flyok666\qiniu\Qiniu;
 use flyok666\uploadifive\UploadAction;
 use yii\web\Controller;
@@ -35,13 +31,13 @@ class UploadController extends Controller
                     return "{$dateFile}{$filename}.{$fileext}";
                 },
 
-               /* 'format' => function (UploadAction $action) {
-                    $fileext = $action->uploadfile->getExtension();
-                    $filehash = sha1(uniqid() . time());
-                    $p1 = substr($filehash, 0, 2);
-                    $p2 = substr($filehash, 2, 2);
-                    return "{$p1}/{$p2}/{$filehash}.{$fileext}";
-                },*/
+                /* 'format' => function (UploadAction $action) {
+                     $fileext = $action->uploadfile->getExtension();
+                     $filehash = sha1(uniqid() . time());
+                     $p1 = substr($filehash, 0, 2);
+                     $p2 = substr($filehash, 2, 2);
+                     return "{$p1}/{$p2}/{$filehash}.{$fileext}";
+                 },*/
                 //END CLOSURE BY TIME
                 'validateOptions' => [
                     'extensions' => ['jpg', 'png','gif','bmp'],
@@ -53,9 +49,9 @@ class UploadController extends Controller
                 'afterValidate' => function (UploadAction $action) {},
                 'beforeSave' => function (UploadAction $action) {},
                 'afterSave' => function (UploadAction $action) {
-                    //Í¼Æ¬ÔÚ×Ô¼ºµÄ·þÎñÆ÷ÉÏ
+                    //å›¾ç‰‡åœ¨è‡ªå·±çš„æœåŠ¡å™¨ä¸Š
                     $action->output['fileUrl'] = $action->getWebUrl();
-                    //½«Í¼Æ¬¸´ÖÆÒ»·Ýµ½ÆßÅ£ÔÆÉÏÃæ
+                    //å°†å›¾ç‰‡å¤åˆ¶ä¸€ä»½åˆ°ä¸ƒç‰›äº‘ä¸Šé¢
                     //$action->getFilename(); // "image/yyyymmddtimerand.jpg"
                     //$action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
                     //$action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
@@ -97,9 +93,9 @@ class UploadController extends Controller
                 'afterValidate' => function (UploadAction $action) {},
                 'beforeSave' => function (UploadAction $action) {},
                 'afterSave' => function (UploadAction $action) {
-                    //1.Í¼Æ¬ÔÚ×Ô¼ºµÄ·þÎñÆ÷ÉÏ
+                    //1.å›¾ç‰‡åœ¨è‡ªå·±çš„æœåŠ¡å™¨ä¸Š
                     $action->output['fileUrl'] = $action->getWebUrl();
-                    //2.½«Í¼Æ¬¸´ÖÆÒ»·Ýµ½ÆßÅ£ÔÆÉÏÃæ
+                    //2.å°†å›¾ç‰‡å¤åˆ¶ä¸€ä»½åˆ°ä¸ƒç‰›äº‘ä¸Šé¢
                     $qiniu = new Qiniu(\Yii::$app->params['qiniu']);
                     $key = $action->getWebUrl();
                     $qiniu->uploadFile($action->getSavePath(),$key);
@@ -110,8 +106,65 @@ class UploadController extends Controller
                     //$action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
                 },
             ],
+            'gallery-upload' => [
+                'class' => UploadAction::className(),
+                'basePath' => '@data/brand',
+                'baseUrl' => '@web/brand',//
+                'enableCsrf' => true, // default
+                'postFieldName' => 'Filedata', // default
+                //BEGIN METHOD
+                //'format' => [$this, 'methodName'],
+                //END METHOD
+                //BEGIN CLOSURE BY-HASH
+                'overwriteIfExist' => true,
+                'format' => function (UploadAction $action) {
+                    $dateFile = date('Ymd',time()).'/';
+                    $fileext = $action->uploadfile->getExtension();
+                    $filename = sha1_file($action->uploadfile->tempName);
+                    return "{$dateFile}{$filename}.{$fileext}";
+                },
+
+                /* 'format' => function (UploadAction $action) {
+                     $fileext = $action->uploadfile->getExtension();
+                     $filehash = sha1(uniqid() . time());
+                     $p1 = substr($filehash, 0, 2);
+                     $p2 = substr($filehash, 2, 2);
+                     return "{$p1}/{$p2}/{$filehash}.{$fileext}";
+                 },*/
+                //END CLOSURE BY TIME
+                'validateOptions' => [
+                    'extensions' => ['jpg', 'png','gif','bmp'],
+                    'maxSize' => 1 * 1024 * 1024, //file size
+                ],
+                'beforeValidate' => function (UploadAction $action) {
+                    //throw new Exception('test error');
+                },
+                'afterValidate' => function (UploadAction $action) {},
+                'beforeSave' => function (UploadAction $action) {},
+                'afterSave' => function (UploadAction $action) {
+                    //å›¾ç‰‡åœ¨è‡ªå·±çš„æœåŠ¡å™¨ä¸Š
+                    $goodsGallery=new GoodsGallery();
+                    $goodsGallery->goods_id=(int)\Yii::$app->request->get('goods_id');
+                    $goodsGallery->path=$action->getWebUrl();
+                    $goodsGallery->save();
+                    $action->output['fileUrl'] = $action->getWebUrl();
+                    $action->output['id'] = $goodsGallery->id;
+                    //å°†å›¾ç‰‡å¤åˆ¶ä¸€ä»½åˆ°ä¸ƒç‰›äº‘ä¸Šé¢
+                    //$action->getFilename(); // "image/yyyymmddtimerand.jpg"
+                    //$action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
+                    //$action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
+                },
+            ],
         ];
 
+    }
+    //è®¾ç½®è·¯ç”±æƒé™
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
     }
 
 }

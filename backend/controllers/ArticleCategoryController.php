@@ -74,7 +74,13 @@ class ArticleCategoryController extends Controller
         //var_dump($brand->status);exit;
         return $this->redirect(['article-category/index']);
     }
-
-
+//设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
 
 }

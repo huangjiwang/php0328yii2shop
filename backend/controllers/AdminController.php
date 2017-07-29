@@ -5,6 +5,8 @@ namespace backend\controllers;
 
 use backend\models\Admin;
 use backend\models\LoginForm;
+use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 use yii\web\Request;
 
 class AdminController extends \yii\web\Controller
@@ -33,9 +35,6 @@ class AdminController extends \yii\web\Controller
         return $this->render('login',['model'=>$model]);
     }
 
-public function actionAaa(){
-    var_dump(\Yii::$app->user->identity->username);
-}
     public function actionIndex()
     {
         $model =Admin::find()->all();
@@ -43,7 +42,7 @@ public function actionAaa(){
         return $this->render('index',['model'=>$model]);
     }
 
-
+//添加用户
     public function actionAdd(){
         //实列化一个表单
         $admin = new Admin();
@@ -58,6 +57,21 @@ public function actionAaa(){
                 $admin->password = \Yii::$app->security->generatePasswordHash($admin->password);
                 $admin->auth_key=\Yii::$app->security->generateRandomString();
                 $admin->save(false);
+
+               //var_dump($admin->juese,$admin->id);exit;
+                //用户与角色的关联
+                $authManager=\Yii::$app->authManager;
+                //获取角色
+                $authManager->getRole($admin->juese);
+                //判断是否是个数组
+                if(is_array($admin->juese)){
+                    //如果是个数组就遍历依次遍历出来添加
+                        foreach($admin->juese as $js){
+                            $juese=$authManager->getRole($js);
+                            $authManager->assign($juese,$admin->id);
+                    }
+                }
+                \Yii::$app->session->setFlash('success','添加成功');
                 return $this->redirect(['admin/index']);
             }else{
                 //验证或保存失败
@@ -71,6 +85,12 @@ public function actionAaa(){
     public function actionEdit($id){
         //实列化一个表单
         $admin=Admin::findOne(['id'=>$id]);
+        //取消角色和权限的关联
+        $authManager=\Yii::$app->authManager;
+       //根据用户ID 查角色
+        $juese=$authManager->getRolesByUser($admin->id);
+        //表单权限回显
+        $admin->juese=ArrayHelper::map($juese,'name','name');
         $requerst=new Request();
         //判断是否以post方式提交
         if($requerst->isPost){
@@ -81,6 +101,23 @@ public function actionAaa(){
                 $admin->username = $admin->username;
                 $admin->password = \Yii::$app->security->generatePasswordHash($admin->password);
                 $admin->save(false);
+                //修改用户角色
+                //用户与角色的关联
+                $authManager=\Yii::$app->authManager;
+                //获取角色
+                $authManager->getRole($admin->juese);
+                //取消全部关联
+                $authManager->revokeAll($admin->id);
+                //判断是否是个数组
+                if(is_array($admin->juese)){
+                    //如果是个数组就遍历依次遍历出来添加
+                    foreach($admin->juese as $js){
+                        $juese=$authManager->getRole($js);
+                        $authManager->assign($juese,$admin->id);
+                    }
+                }
+                //提示操作
+                \Yii::$app->session->setFlash('success','修改成功');
                 return $this->redirect(['admin/index']);
             }else{
                 //验证或保存失败
@@ -92,8 +129,22 @@ public function actionAaa(){
     }
 //删除
     public function actionDelete($id){
+
         $admin=Admin::findOne(['id'=>$id]);
+        $authManage=\Yii::$app->authManager;
+        //根据用户ID 查角色
+        $juese=$authManage->getRolesByUser($admin->id);
+        //var_dump($juese);exit;
+        if($juese==null){
+            throw new NotFoundHttpException('角色不存在');
+        }
+        //删除角色
+        $authManage->revokeAll($id);
+
+        //删除用户
         $admin->delete();
+        //提示操作
+        \Yii::$app->session->setFlash('success','删除成功');
         //var_dump($brand->status);exit;
         return $this->redirect(['admin/index']);
     }

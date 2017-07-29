@@ -17,6 +17,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
+    public $juese=[];
     public $qrpassword;
     public $jpassword;
     public $xpassword;
@@ -38,6 +39,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             [['password','xpassword','qrpassword'], 'string', 'max' => 100],
             [['password','username'], 'required','on'=>self::SCENARIO_ADD],
             [['jpassword','xpassword','qrpassword'], 'required','on'=>self::SCENARIO_EDITUSER],
+            ['juese','safe'],
         ];
     }
 
@@ -53,6 +55,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'password' => '密码',
             'xpassword' => '新密码',
             'qrpassword' => '确认密码',
+            'juese'=>'角色'
         ];
     }
 

@@ -6,6 +6,7 @@ namespace backend\controllers;
 use backend\models\GoodsCategory;
 use yii\web\Controller;
 use yii\web\HttpException;
+use backend\filters\RbacFilter;
 
 class GoodsCategoryController extends Controller{
     //添加商品分类
@@ -82,7 +83,14 @@ class GoodsCategoryController extends Controller{
             $model->delete();
             return $this->redirect(['goods-category/index']);
         }
+    }
 
-
+    //设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
     }
 }

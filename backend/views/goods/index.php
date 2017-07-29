@@ -42,6 +42,7 @@ echo \yii\helpers\Html::submitButton('搜索',['class'=>'btn btn-info']);
                 <td><?=$row->create_time?></td>
                 <td><?=$row->view_times?></td>
                 <td>
+                    <?=\yii\bootstrap\Html::a('相册',['goods/gallery','id'=>$row->id],['class'=>'btn btn-default'])?>
                     <?=\yii\bootstrap\Html::a('修改',['goods/edit','id'=>$row->id],['class'=>'btn btn-sm btn-warning'])?>
                     <?=\yii\bootstrap\Html::a('查看',['goods/list','id'=>$row->id],['class'=>'btn btn-sm btn-primary'])?>
                     <?=\yii\bootstrap\Html::a('删除',['goods/delete','id'=>$row->id],['class'=>'btn btn-sm btn-danger'])?>

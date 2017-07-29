@@ -2,14 +2,17 @@
 namespace backend\controllers;
 
 
+use backend\filters\RbacFilter;
 use backend\models\Brand;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
 use backend\models\GoodsDayCount;
+use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
 use backend\models\GoodsSearchForm;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\UploadedFile;
 use yii\data\Pagination;
@@ -109,7 +112,7 @@ class GoodsController extends Controller{
         //商品表
         $model=Goods::findOne(['id'=>$id]);
         //文章详情表
-        $intro=new GoodsIntro();
+        $intro=GoodsIntro::findOne($id);
         $request=new Request();
         //判断是否以post方式提交的
         if($request->isPost) {
@@ -173,5 +176,38 @@ class GoodsController extends Controller{
     {
         $goodsintro = GoodsIntro:: findOne(['goods_id' => $id]);
         echo '<h1>' . $goodsintro->content . '</h1>';
+    }
+    /*
+    * 商品相册
+    */
+    public function actionGallery($id)
+    {
+        $goods = Goods::findOne(['id'=>$id]);
+        $goods_gallery=GoodsGallery::find()->where(['goods_id'=>$id])->all();
+        if($goods == null){
+            throw new NotFoundHttpException('商品不存在');
+        }
+        //var_dump($goods->galleries);exit;
+        return $this->render('gallery',['goods_id'=>$id,'goods_gallery'=>$goods_gallery]);
+    }
+
+     //AJAX删除图片
+
+    public function actionDelGallery(){
+        $id = \Yii::$app->request->post('id');
+        $model = GoodsGallery::findOne(['id'=>$id]);
+        if($model  && $model->delete()){
+            return 'success';
+        }else{
+            return 'fail';
+        }
+    }
+//设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
     }
 }

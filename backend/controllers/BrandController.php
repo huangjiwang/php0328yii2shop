@@ -6,6 +6,7 @@ use yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\Request;
 use yii\web\UploadedFile;
+use backend\filters\RbacFilter;
 
 class BrandController extends Controller{
     //展示列表
@@ -74,5 +75,14 @@ class BrandController extends Controller{
         $brand->save(false);
         //var_dump($brand->status);exit;
         return $this->redirect(['brand/index']);
+    }
+
+    //设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
     }
 }

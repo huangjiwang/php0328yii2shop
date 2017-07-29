@@ -8,6 +8,7 @@ use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Request;
+use backend\filters\RbacFilter;
 
 class ArticleController extends Controller{
     //显示
@@ -109,5 +110,14 @@ class ArticleController extends Controller{
     public function actionList($id){
         $articledetail=ArticleDetail :: findOne(['id'=>$id]);
         echo '<h1>'.$articledetail->content.'</h1>';
+    }
+
+    //设置路由权限
+    public function behaviors(){
+        return[
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
     }
 }

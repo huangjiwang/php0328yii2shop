@@ -33,6 +33,13 @@ class Goods extends ActiveRecord{
     {
         return $this->hasOne(GoodsCategory::className(),['id'=>'sn']);//hasOne 返回一个对象
     }
+    /*
+    * 商品和相册关系 1对多
+    */
+    public function getGalleries()
+    {
+        return $this->hasMany(GoodsGallery::className(),['goods_id'=>'id']);
+    }
 //    public function getGoodsIntro()
 //    {
 //        return $this->hasOne(GoodsIntro::className(),['id'=>'goods_id']);//hasOne 返回一个对象
