@@ -77,12 +77,12 @@ class BrandController extends Controller{
         return $this->redirect(['brand/index']);
     }
 
-    //设置路由权限
-    public function behaviors(){
-        return[
-            'rbac'=>[
-                'class'=>RbacFilter::className(),
-            ]
-        ];
-    }
+//    //设置路由权限
+//    public function behaviors(){
+//        return[
+//            'rbac'=>[
+//                'class'=>RbacFilter::className(),
+//            ]
+//        ];
+//    }
 }

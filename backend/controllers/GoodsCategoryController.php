@@ -85,12 +85,12 @@ class GoodsCategoryController extends Controller{
         }
     }
 
-    //设置路由权限
-    public function behaviors(){
-        return[
-            'rbac'=>[
-                'class'=>RbacFilter::className(),
-            ]
-        ];
-    }
+//    //设置路由权限
+//    public function behaviors(){
+//        return[
+//            'rbac'=>[
+//                'class'=>RbacFilter::className(),
+//            ]
+//        ];
+//    }
 }

@@ -3,11 +3,11 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>登录商城</title>
-	<link rel="stylesheet" href="style/base.css" type="text/css">
-	<link rel="stylesheet" href="style/global.css" type="text/css">
-	<link rel="stylesheet" href="style/header.css" type="text/css">
-	<link rel="stylesheet" href="style/login.css" type="text/css">
-	<link rel="stylesheet" href="style/footer.css" type="text/css">
+	<link rel="stylesheet" href="/style/base.css" type="text/css">
+	<link rel="stylesheet" href="/style/global.css" type="text/css">
+	<link rel="stylesheet" href="/style/header.css" type="text/css">
+	<link rel="stylesheet" href="/style/login.css" type="text/css">
+	<link rel="stylesheet" href="/style/footer.css" type="text/css">
 </head>
 <body>
 	<!-- 顶部导航 start -->
@@ -50,22 +50,24 @@
 			<div class="login_form fl">
 				<?php $form = \yii\widgets\ActiveForm::begin()?>
 					<ul>
-						<li>
+						<li id="username">
 							<label for="">用户名：</label>
-							<input type="text" class="txt" name="username" />
+							<input type="text" class="txt" name="LoginForm[username]" />
+							<p></p>
 						</li>
-						<li>
+						<li id="password">
 							<label for="">密码：</label>
-							<input type="password" class="txt" name="password" />
+							<input type="password" class="txt" name="LoginForm[password]" />
 							<a href="">忘记密码?</a>
+							<p></p>
 						</li>
 						<li class="checkcode" id="code">
 							<?=$form->field($model,'code')->widget(\yii\captcha\Captcha::className())?>
 						</li>
 						<li>
 							<label for="">&nbsp;</label>
-							<input type="checkbox" class="chb"  /> 保存登录信息
-						</li>
+							<?php echo $form->field($model,'zddl')->checkbox();?>
+						</li><br/>
 						<li>
 							<label for="">&nbsp;</label>
 							<input type="submit" value="" class="login_btn" />

@@ -16,7 +16,7 @@ return [
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'frontend\models\member',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
         ],
@@ -44,6 +44,13 @@ return [
             ],
         ],
         */
+        'sms'=>[
+            'class'=>\frontend\components\AliyunSms::className(),
+            'accessKeyId'=>'LTAIVvlBJrrJrBsa',
+            'accessKeySecret'=>'BEACa6AniUHnzWP0Vig5KNqDy7z2bF',
+            'signName'=>'旺旺茶馆',
+            'templateCode'=>'SMS_80160059'
+        ]
     ],
     'params' => $params,
 ];

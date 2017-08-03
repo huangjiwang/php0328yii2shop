@@ -112,12 +112,12 @@ class ArticleController extends Controller{
         echo '<h1>'.$articledetail->content.'</h1>';
     }
 
-    //设置路由权限
-    public function behaviors(){
-        return[
-            'rbac'=>[
-                'class'=>RbacFilter::className(),
-            ]
-        ];
-    }
+//    //设置路由权限
+//    public function behaviors(){
+//        return[
+//            'rbac'=>[
+//                'class'=>RbacFilter::className(),
+//            ]
+//        ];
+//    }
 }
