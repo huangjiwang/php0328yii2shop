@@ -8,13 +8,13 @@ class Member extends ActiveRecord implements IdentityInterface{
 
     public $repassword;
     public $code;//图像验证码
-    public $smsCode;//短信验证码
+    public $smscode;//短信验证码
     public function rules()
     {
         return [
             [['username','password_hash','repassword','code','email','tel'],'required'],
             [['code'], 'captcha'],
-            [['last_login_time', 'last_login_ip', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['last_login_time', 'last_login_ip', 'status', 'created_at', 'updated_at','smscode'], 'integer'],
             [['username'], 'string', 'max' => 50],
             [['auth_key'], 'string', 'max' => 32],
             [['password_hash', 'email'], 'string', 'max' => 100],

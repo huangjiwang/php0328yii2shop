@@ -52,7 +52,7 @@
 	<!-- 页面头部 end -->
 	
 	<div style="clear:both;"></div>
-
+	<form action="/index.php?r=home/order" method="post" id="form">
 	<!-- 主体部分 start -->
 	<div class="fillin w990 bc mt15">
 		<div class="fillin_hd">
@@ -64,9 +64,9 @@
 			<div class="address">
 				<h3>收货人信息</h3>
 				<div class="address_info">
-				<p>
-					<input type="radio" value="1" name="address_id"/>张三  17002810530  北京市 昌平区 一号楼大街 </p>
-					<input type="radio" value="1" name="address_id"/>李四  17002810530  四川省 成都市 高新区 和平街 </p>
+					<?php foreach($addresss as $address){?>
+				<p><input type="radio" value="<?=$address->consignee?>" name="Order[name]"/><?=$address->consignee?>  <?=$address->tel?> <?=$address->sheng?> <?=$address->shi?> <?=$address->xian?></p>
+				<?php }?>
 				</div>
 
 
@@ -88,32 +88,16 @@
 							</tr>
 						</thead>
 						<tbody>
+						<?php foreach($deliverys as $key=>$delivery){?>
+
 							<tr class="cur">	
 								<td>
-									<input type="radio" name="delivery" checked="checked" />普通快递送货上门
-
+									<input type="radio" name="Order[delivery_id]" checked="checked" value="<?=$key?>" /><?=$delivery['name']?>
 								</td>
-								<td>￥10.00</td>
-								<td>每张订单不满499.00元,运费15.00元, 订单4...</td>
+								<td><?=$delivery['freight']?></td>
+								<td><?=$delivery['intr']?></td>
 							</tr>
-							<tr>
-								
-								<td><input type="radio" name="delivery" />特快专递</td>
-								<td>￥40.00</td>
-								<td>每张订单不满499.00元,运费40.00元, 订单4...</td>
-							</tr>
-							<tr>
-								
-								<td><input type="radio" name="delivery" />加急快递送货上门</td>
-								<td>￥40.00</td>
-								<td>每张订单不满499.00元,运费40.00元, 订单4...</td>
-							</tr>
-							<tr>
-
-								<td><input type="radio" name="delivery" />平邮</td>
-								<td>￥10.00</td>
-								<td>每张订单不满499.00元,运费15.00元, 订单4...</td>
-							</tr>
+						<?php }?>
 						</tbody>
 					</table>
 
@@ -127,56 +111,19 @@
 
 
 				<div class="pay_select">
-					<table> 
+					<table>
+						<?PHP foreach($payments as $key=>$payment){?>
 						<tr class="cur">
-							<td class="col1"><input type="radio" name="pay" />货到付款</td>
-							<td class="col2">送货上门后再收款，支持现金、POS机刷卡、支票支付</td>
+							<td class="col1"><input type="radio" name="Order[payment_id]" value="<?=$key?>"/><?=$payment['name']?></td>
+							<td class="col2"><?=$payment['aaa']?></td>
 						</tr>
-						<tr>
-							<td class="col1"><input type="radio" name="pay" />在线支付</td>
-							<td class="col2">即时到帐，支持绝大数银行借记卡及部分银行信用卡</td>
-						</tr>
-						<tr>
-							<td class="col1"><input type="radio" name="pay" />上门自提</td>
-							<td class="col2">自提时付款，支持现金、POS刷卡、支票支付</td>
-						</tr>
-						<tr>
-							<td class="col1"><input type="radio" name="pay" />邮局汇款</td>
-							<td class="col2">通过快钱平台收款 汇款后1-3个工作日到账</td>
-						</tr>
+						<?php }?>
 					</table>
 
 				</div>
 			</div>
 			<!-- 支付方式  end-->
 
-			<!-- 发票信息 start-->
-			<div class="receipt none">
-				<h3>发票信息 </h3>
-
-
-				<div class="receipt_select ">
-					<form action="">
-						<ul>
-							<li>
-								<label for="">发票抬头：</label>
-								<input type="radio" name="type" checked="checked" class="personal" />个人
-								<input type="radio" name="type" class="company"/>单位
-								<input type="text" class="txt company_input" disabled="disabled" />
-							</li>
-							<li>
-								<label for="">发票内容：</label>
-								<input type="radio" name="content" checked="checked" />明细
-								<input type="radio" name="content" />办公用品
-								<input type="radio" name="content" />体育休闲
-								<input type="radio" name="content" />耗材
-							</li>
-						</ul>						
-					</form>
-
-				</div>
-			</div>
-			<!-- 发票信息 end-->
 
 			<!-- 商品清单 start -->
 			<div class="goods">
@@ -191,18 +138,15 @@
 						</tr>	
 					</thead>
 					<tbody>
+					<?php foreach($goodss as $goods){?>
+
 						<tr>
-							<td class="col1"><a href=""><img src="images/cart_goods1.jpg" alt="" /></a>  <strong><a href="">【1111购物狂欢节】惠JackJones杰克琼斯纯羊毛菱形格</a></strong></td>
-							<td class="col3">￥499.00</td>
-							<td class="col4"> 1</td>
-							<td class="col5"><span>￥499.00</span></td>
+							<td class="col1"><a href=""></a><?=\yii\helpers\Html::img('http://img.yiishop.com:8080'.$goods['logo'],['style'=>'width:50px'])?>  <strong><a href=""><?=$goods['name']?></a></strong></td>
+							<td class="col3"><?=$goods['shop_price']?></td>
+							<td class="col4"><?=$carts[$goods['id']]?> </td>
+							<td class="col5"><span>￥<?=$goods['shop_price']* $carts[$goods['id']]?></span></td>
 						</tr>
-						<tr>
-							<td class="col1"><a href=""><img src="images/cart_goods2.jpg" alt="" /></a> <strong><a href="">九牧王王正品新款时尚休闲中长款茄克EK01357200</a></strong></td>
-							<td class="col3">￥1102.00</td>
-							<td class="col4">1</td>
-							<td class="col5"><span>￥1102.00</span></td>
-						</tr>
+					<?php }?>
 					</tbody>
 					<tfoot>
 						<tr>
@@ -235,11 +179,13 @@
 		</div>
 
 		<div class="fillin_ft">
-			<a href=""><span>提交订单</span></a>
+			<a id="aaa" href="javascript:stumit()"><span>提交订单</span></a>
+
 			<p>应付总额：<strong>￥5076.00元</strong></p>
 			
 		</div>
 	</div>
+		</form>
 	<!-- 主体部分 end -->
 
 	<div style="clear:both;"></div>
@@ -269,5 +215,8 @@
 		</p>
 	</div>
 	<!-- 底部版权 end -->
+<script>function stumit(){
+		$('#form').submit()
+	}</script>
 </body>
 </html>

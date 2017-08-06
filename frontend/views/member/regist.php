@@ -71,13 +71,13 @@
 						</li>
 						<li id="tel">
 							<label for="">手机号码：</label>
-							<input type="text" class="txt" value="" name="Member[tel]" id="tel" placeholder=""/>
+							<input type="text" value="<?=$model->tel?>" class="txt" value="" name="Member[tel]" id="telNumber" placeholder=""/>
 							<p></p>
 						</li>
-						<li id="smsCode">
+						<li id="smscode">
 							<label for="">验证码：</label>
-							<input type="text" class="txt" value="" placeholder="请输入短信验证码" name="Member[smsCode]" disabled="disabled" id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px"/>
-
+							<input type="text" class="txt" value="" placeholder="请输入短信验证码" name="Member[smscode]"  id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px"/>
+							<p></p>
 						</li>
 						<li class="checkcode" id="code">
 							<?=$form->field($model,'code')->widget(\yii\captcha\Captcha::className())?>
@@ -136,7 +136,17 @@
 	<!-- 底部版权 end -->
 	<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
 	<script type="text/javascript">
-		function bindPhoneNum(){
+
+
+			function bindPhoneNum(){
+				//发送ajax请求
+				var date = {};
+				date.tel = $('#telNumber').val();
+				//console.log(date);
+				$.getJSON('index.php?r=member/get-code', date, function (rtn) {
+					console.log(rtn);
+				});
+
 			//启用输入框
 			$('#captcha').prop('disabled',false);
 
@@ -159,10 +169,10 @@
 		//显示表单错误信息
 		<?php
 			if($model->hasErrors()){
-			foreach ($model->errors as $name=>$error){
-				echo '$("#'.$name.' p").text("'.implode(',',$error).'");';
-				//echo 'alert("'.implode(',',$error).'");';
-			}
+				foreach ($model->errors as $name=>$error){
+					echo '$("#'.$name.' p").text("'.implode(',',$error).'");';
+					//echo 'alert("'.implode(',',$error).'");';
+				}
 			}
 		?>
 

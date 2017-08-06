@@ -1,21 +1,25 @@
 <?php
 namespace frontend\controllers;
 
+use frontend\models\Address;
 use frontend\models\Cart;
 use frontend\models\Goods;
 use frontend\models\GoodsCategory;
 use frontend\models\GoodsGallery;
 use frontend\models\GoodsIntro;
+use frontend\models\Order;
+use frontend\models\OrderGoods;
 use yii\web\Controller;
 use yii\web\Cookie;
 use Yii;
+use yii\web\Request;
 
 class HomeController extends Controller{
     public $layout=false;
     public $enableCsrfValidation = false;
 
 
-    //Ç°Ì¨Ê×Ò³
+    //å‰å°é¦–é¡µ
     public function actionIndex(){
 
         if(\Yii::$app->user->isGuest==false){
@@ -26,30 +30,30 @@ class HomeController extends Controller{
 
 
     }
-    //ÉÌÆ··ÖÀà¹ÜÀíÁĞ±í
+    //å•†å“åˆ†ç±»ç®¡ç†åˆ—è¡¨
     public function actionGoodsCategory(){
         $goodscategory=GoodsCategory::find()->where(['parent_id'=>0])->all();
         //var_dump($goodscategory);exit;
         return $this->render('index',['goodscategory'=>$goodscategory]);
     }
 
-    //ÉÌÆ·ÁĞ±í
+    //å•†å“åˆ—è¡¨
     public function actionGoods($id){
-        //´´½¨Ò»¸öÄ£ĞÍ ²éÑ¯²é³öÉÌÆ··ÖÀàÓëÉÌÆ·¶ÔÓ¦µÄĞÅÏ¢
+        //åˆ›å»ºä¸€ä¸ªæ¨¡å‹ æŸ¥è¯¢æŸ¥å‡ºå•†å“åˆ†ç±»ä¸å•†å“å¯¹åº”çš„ä¿¡æ¯
     $model=Goods::find()->where(['goods_category_id'=>$id])->all();
         //var_dump($model);exit;
         return $this->render('list',['model'=>$model]);
     }
 
-    //ÉÌÆ·ÏêÇéÒ³
+    //å•†å“è¯¦æƒ…é¡µ
     public function actionGoodsIntro($id){
-        //²éÑ¯³öÉÌÆ·ÏêÇéĞÅÏ¢
+        //æŸ¥è¯¢å‡ºå•†å“è¯¦æƒ…ä¿¡æ¯
        $model=GoodsIntro::findOne(['goods_id'=>$id]);
-        //²éÑ¯³öÉÌÆ·ĞÅÏ¢
+        //æŸ¥è¯¢å‡ºå•†å“ä¿¡æ¯
         $model2=Goods::findOne(['id'=>$id]);
-        //²éÑ¯³öÉÌÆ·Ïà²áĞÅÏ¢
+        //æŸ¥è¯¢å‡ºå•†å“ç›¸å†Œä¿¡æ¯
         $model3=GoodsGallery::find()->where(['goods_id'=>$id])->all();
-        //½ÓÊÕ²ÎÊı²¢ÑéÖ¤
+        //æ¥æ”¶å‚æ•°å¹¶éªŒè¯
 //        if($model->load(\Yii::$app->request->post()) && $model->validate()) {
 //            var_dump($model);exit;
 //        }
@@ -57,28 +61,28 @@ class HomeController extends Controller{
         return $this->render('goods',['model'=>$model,'model2'=>$model2,'model3'=>$model3]);
     }
 
-    //Ìí¼Óµ½¹ºÎï³µ³É¹¦Ò³Ãæ
+    //æ·»åŠ åˆ°è´­ç‰©è½¦æˆåŠŸé¡µé¢
     public function actionAddToCart($goods_id=0,$amount=0)
     {
-        //Î´µÇÂ¼
+        //æœªç™»å½•
         if(Yii::$app->user->isGuest){
-            //Èç¹ûÃ»ÓĞµÇÂ¼¾Í´æ·ÅÔÚcookieÖĞ
+            //å¦‚æœæ²¡æœ‰ç™»å½•å°±å­˜æ”¾åœ¨cookieä¸­
             $cookies = Yii::$app->request->cookies;
-            //»ñÈ¡cookieÖĞµÄ¹ºÎï³µÊı¾İ
+            //è·å–cookieä¸­çš„è´­ç‰©è½¦æ•°æ®
             $cart = $cookies->get('cart');
             if($cart==null){
                 $carts = [$goods_id=>$amount];
             }else{
                 $carts = unserialize($cart->value);
                 if(isset($carts[$goods_id])){
-                    //¹ºÎï³µÖĞÒÑ¾­ÓĞ¸ÃÉÌÆ·£¬ÊıÁ¿ÀÛ¼Ó
+                    //è´­ç‰©è½¦ä¸­å·²ç»æœ‰è¯¥å•†å“ï¼Œæ•°é‡ç´¯åŠ 
                     $carts[$goods_id] += $amount;
                 }else{
-                    //¹ºÎï³µÖĞÃ»ÓĞ¸ÃÉÌÆ·
+                    //è´­ç‰©è½¦ä¸­æ²¡æœ‰è¯¥å•†å“
                     $carts[$goods_id] = $amount;
                 }
             }
-            //½«ÉÌÆ·idºÍÉÌÆ·ÊıÁ¿Ğ´Èëcookie
+            //å°†å•†å“idå’Œå•†å“æ•°é‡å†™å…¥cookie
             $cookies = Yii::$app->response->cookies;
             $cookie = new Cookie([
                 'name'=>'cart',
@@ -87,7 +91,7 @@ class HomeController extends Controller{
             ]);
             $cookies->add($cookie);
         }else{
-            //ÓÃ»§ÒÑµÇÂ¼£¬²Ù×÷¹ºÎï³µÊı¾İ±í
+            //ç”¨æˆ·å·²ç™»å½•ï¼Œæ“ä½œè´­ç‰©è½¦æ•°æ®è¡¨
             $model=new Cart();
             if($model->validate()){
                 $model->goods_id=$goods_id;
@@ -101,10 +105,10 @@ class HomeController extends Controller{
 
         return $this->redirect(['cart']);
     }
-    //¹ºÎï³µÒ³Ãæ
+    //è´­ç‰©è½¦é¡µé¢
     public function actionCart()
     {
-        //1 ÓÃ»§Î´µÇÂ¼£¬¹ºÎï³µÊı¾İ´ÓcookieÈ¡³ö
+        //1 ç”¨æˆ·æœªç™»å½•ï¼Œè´­ç‰©è½¦æ•°æ®ä»cookieå–å‡º
         if(Yii::$app->user->isGuest){
             $cookies = Yii::$app->request->cookies;
             $cart = $cookies->get('cart');
@@ -113,10 +117,10 @@ class HomeController extends Controller{
             }else{
                 $carts = unserialize($cart->value);
             }
-            //»ñÈ¡ÉÌÆ·Êı¾İ
+            //è·å–å•†å“æ•°æ®
             $models = Goods::find()->where(['in','id',array_keys($carts)])->asArray()->all();
         }else{
-            //2 ÓÃ»§ÒÑµÇÂ¼£¬¹ºÎï³µÊı¾İ´ÓÊı¾İ±íÈ¡
+            //2 ç”¨æˆ·å·²ç™»å½•ï¼Œè´­ç‰©è½¦æ•°æ®ä»æ•°æ®è¡¨å–
             $member_id=Yii::$app->user->getId();
             $goods_id=[];
             $carts=[];
@@ -131,29 +135,29 @@ class HomeController extends Controller{
         }
         return $this->render('cart',['models'=>$models,'carts'=>$carts]);
     }
-    //ĞŞ¸Ä¹ºÎï³µÊı¾İ
+    //ä¿®æ”¹è´­ç‰©è½¦æ•°æ®
     public function actionAjaxCart()
     {
         $goods_id = Yii::$app->request->post('goods_id');
         $amount = Yii::$app->request->post('amount');
-        //Êı¾İÑéÖ¤
+        //æ•°æ®éªŒè¯
         if(Yii::$app->user->isGuest){
             $cookies = Yii::$app->request->cookies;
-            //»ñÈ¡cookieÖĞµÄ¹ºÎï³µÊı¾İ
+            //è·å–cookieä¸­çš„è´­ç‰©è½¦æ•°æ®
             $cart = $cookies->get('cart');
             if($cart==null){
                 $carts = [$goods_id=>$amount];
             }else{
-                $carts = unserialize($cart->value);//[1=>99£¬2=¡·1]
+                $carts = unserialize($cart->value);
                 if(isset($carts[$goods_id])){
-                    //¹ºÎï³µÖĞÒÑ¾­ÓĞ¸ÃÉÌÆ·£¬¸üĞÂÊıÁ¿
+                    //è´­ç‰©è½¦ä¸­å·²ç»æœ‰è¯¥å•†å“ï¼Œæ›´æ–°æ•°é‡
                     $carts[$goods_id] = $amount;
                 }else{
-                    //¹ºÎï³µÖĞÃ»ÓĞ¸ÃÉÌÆ·
+                    //è´­ç‰©è½¦ä¸­æ²¡æœ‰è¯¥å•†å“
                     $carts[$goods_id] = $amount;
                 }
             }
-            //½«ÉÌÆ·idºÍÉÌÆ·ÊıÁ¿Ğ´Èëcookie
+            //å°†å•†å“idå’Œå•†å“æ•°é‡å†™å…¥cookie
             $cookies = Yii::$app->response->cookies;
             $cookie = new Cookie([
                 'name'=>'cart',
@@ -164,16 +168,16 @@ class HomeController extends Controller{
             return 'success';
         }
     }
-    //É¾³ıÎ´µÇÂ¼µÄ¹ºÎï³µÊı¾İ
+    //åˆ é™¤æœªç™»å½•çš„è´­ç‰©è½¦æ•°æ®
     public function actionDelCart($goods_id)
     {
-        if (\Yii::$app->user->isGuest) {//Î´µÇÂ¼
+        if (\Yii::$app->user->isGuest) {//æœªç™»å½•
             $cookies = \Yii::$app->request->cookies;
             if ($cookies->get('cart') != null) {
                 $cookie = $cookies->get('cart');
                 $carts = unserialize($cookie->value);
                 if (isset($carts[$goods_id])) {
-                    //¹ºÎï³µÖĞÒÑ¾­ÓĞ¸ÃÉÌÆ·£¬¸üĞÂÊıÁ¿
+                    //è´­ç‰©è½¦ä¸­å·²ç»æœ‰è¯¥å•†å“ï¼Œæ›´æ–°æ•°é‡
                     unset($carts[$goods_id]);
                     $cookie = new Cookie([
                         'name' => 'cart',
@@ -185,7 +189,7 @@ class HomeController extends Controller{
                 }
             }
         } else {
-            //µÇÂ¼
+            //ç™»å½•
             $member_id = \Yii::$app->user->getId();
             Cart::deleteAll(['goods_id' => $goods_id, 'member_id' => $member_id]);
         }
@@ -193,10 +197,107 @@ class HomeController extends Controller{
 
     }
 
-    //¶©µ¥±í
-    public function actionOrder(){
-        
-        return $this->render('order');
+    //è®¢å•è¡¨
+    public function actionOrder()
+    {
+        if (\Yii::$app->user->isGuest) {//æœªç™»å½•
+            return $this->redirect(['member/login']);
+        } else {
+            //æ”¶è´§åœ°å€
+            $user_name = \Yii::$app->user->identity->username;
+            $addresss = Address::find()->where(['=', 'user_name', $user_name])->all();
+            //é€è´§æ–¹å¼
+            $deliverys = [
+                ['name' => 'æ™®é€šå¿«é€’é€è´§ä¸Šé—¨', 'freight' => 10, 'intr' => 'æœåŠ¡ä¸€èˆ¬,é€Ÿåº¦è¾ƒæ…¢'],
+                ['name' => 'ç‰¹å¿«å¿«é€’', 'freight' => 50, 'intr' => 'æœåŠ¡ä¸€èˆ¬,é€Ÿåº¦å¿«'],
+                ['name' => 'åŠ æ€¥å¿«é€’', 'freight' => 60, 'intr' => 'æœåŠ¡ä¸€èˆ¬,é€Ÿåº¦æœ€å¿«'],
+                ['name' => 'å¹³é‚®å¿«é€’', 'freight' => 10, 'intr' => 'æœåŠ¡å¥½,é€Ÿåº¦æ…¢'],
+            ];
+            //æ”¯ä»˜æ–¹å¼
+            $payments = [
+                ['name' => 'è´§åˆ°ä»˜æ¬¾', 'aaa' => '	é€è´§ä¸Šé—¨åå†æ”¶æ¬¾ï¼Œæ”¯æŒç°é‡‘ã€POSæœºåˆ·å¡ã€æ”¯ç¥¨æ”¯ä»˜'],
+                ['name' => 'åœ¨çº¿ä»˜æ¬¾', 'aaa' => '	å³æ—¶åˆ°å¸ï¼Œæ”¯æŒç»å¤§æ•°é“¶è¡Œå€Ÿè®°å¡åŠéƒ¨åˆ†é“¶è¡Œä¿¡ç”¨å¡'],
+                ['name' => 'ä¸Šé—¨è‡ªæ', 'aaa' => '	è‡ªææ—¶ä»˜æ¬¾ï¼Œæ”¯æŒç°é‡‘ã€POSåˆ·å¡ã€æ”¯ç¥¨æ”¯ä»˜'],
+                ['name' => 'é‚®å±€æ±‡æ¬¾', 'aaa' => '	é€šè¿‡å¿«é’±å¹³å°æ”¶æ¬¾ æ±‡æ¬¾å1-3ä¸ªå·¥ä½œæ—¥åˆ°è´¦'],
+            ];
+
+            //å•†å“æ¸…å•
+            $member_id = Yii::$app->user->getId();
+            $goods_id = [];
+            $carts = [];
+
+            $models = Cart::find()->where(['=', 'member_id', $member_id])->asArray()->all();
+            foreach ($models as $model) {
+                $goods_id[] = $model['goods_id'];
+                $carts[$model['goods_id']] = $model['amount'];
+            }
+            $goodss = Goods::find()->where(['in', 'id', $goods_id])->asArray()->all();
+
+            $order = new Order();
+            $requerst = new Request();
+            //åˆ¤æ–­æ˜¯å¦ä»¥postæ–¹å¼æäº¤
+            if ($requerst->isPost) {
+                $order->load($requerst->post(), 'Order');
+                //éªŒè¯æ•°æ®
+                if ($order->validate()) {
+                    //ç”¨æˆ·id
+                    $user_name = \Yii::$app->user->id;
+                    //æ”¶è´§åœ°å€
+                    $address = Address::findOne(['consignee' => $order->name]);
+                    $order->member_id = $user_name;
+                    $order->name = $address->consignee;
+                    $order->province = $address->sheng;
+                    $order->city = $address->shi;
+                    $order->area = $address->xian;
+                    $order->address = $address->detailed;
+                    $order->tel = $address->tel;
+                    //é…é€æ–¹å¼
+                    $delivery = $deliverys[$order->delivery_id];
+                    $order->delivery_id = $order->delivery_id;
+                    $order->delivery_name = $delivery['name'];
+                    $order->delivery_price = $delivery['freight'];
+                    //æ”¯ä»˜æ–¹å¼
+                    $payment = $payments[$order->payment_id];
+                    $order->payment_id = $order->payment_id;
+                    $order->payment_name = $payment['name'];
+                    $order->status=1;
+                    //åˆ›å»ºæ—¶é—´
+                    $order->create_time =time();
+                    $order->save();
+                    //è®¢å•å•†å“è¯¦æƒ…è¡¨
+                    foreach ($goodss as $goods) {
+                        $order_goods = new OrderGoods();
+                        $order_goods->order_id = $order->id;
+                        $order_goods->goods_id = $goods['id'];
+                        $order_goods->goods_name = $goods['name'];
+                        $order_goods->logo = $goods['logo'];
+                        $order_goods->price = $goods['shop_price'];
+                        $order_goods->amount = $carts[$goods['id']];
+                        $order_goods->total = $carts[$goods['id']] * $goods['shop_price'];
+                        $order_goods->save();
+                    }
+                    Cart::deleteAll(['member_id' => $user_name]);
+                    return $this->render('order2');
+                }
+            }
+            return $this->render('order', ['carts' => $carts, 'goodss' => $goodss, 'addresss' => $addresss, 'deliverys' => $deliverys, 'payments' => $payments]);
+        }
     }
 
+    public function actionOrder2(){
+        if (\Yii::$app->user->isGuest) {//æœªç™»å½•
+            return $this->redirect(['member/login']);
+        } else {
+            $user_id = \Yii::$app->user->id;
+            $models=Order::find()->where(['=','member_id',$user_id])->all();
+
+
+            return $this->render('order3',['models'=>$models]);
+        }
+    }
+    public function actionOrder3($id){
+        $model=Order::findOne(['id'=>$id]);
+        $model->status=0;
+        $model->save();
+    }
 }

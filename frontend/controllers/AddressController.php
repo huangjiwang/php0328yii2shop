@@ -20,7 +20,10 @@ class AddressController extends Controller{
             }
         }
         //查询出收货数据 显示表单
+        //$user_name = \Yii::$app->user->identity->username;
+        //$model2=Address::find()->where(['=','user_name','$user_name'])->all();
         $model2=Address::find()->all();
+        //var_dump($model2);exit;
         return $this->render('address',['model2'=>$model2,'model'=>$model]);
     }
 

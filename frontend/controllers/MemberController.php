@@ -22,16 +22,20 @@ class MemberController extends Controller{
         //实例化一个模型
         $model=new Member();
         if($model->load(\Yii::$app->request->post()) &&  $model->validate()){
-            //var_dump($model->repassword,$model->password_hash);exit;
-            //判断两次密码是否一致
-           // if($model->repassword == $model->password_hash){
+//            //短信验证
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1');
+//
+            if($model->smscode == $redis->get('code_'.$model->tel)){
+                //判断两次密码是否一致
                 $model->password_hash = \Yii::$app->security->generatePasswordHash($model->password_hash);
                 $model->save(false);
                 \Yii::$app->session->setFlash('success','添加成功');
+                $model->save(false);
                 return $this->redirect(['member/login']);
-           // }else{
-                //\Yii::$app->session->setFlash('success','两次密码不一致');
-           // }
+            }else{
+                $model->addError('smscode','短信验证码错误');
+            }
         }
         //跳转到试图
         return $this->render('regist',['model'=>$model]);
@@ -89,7 +93,35 @@ class MemberController extends Controller{
         $res = \Yii::$app->sms->setPhoneNumbers($tel)->setTemplateParam(['code'=>$code])->send();
 
     }
-
+    /**
+     * 注册时的短信验证码
+     */
+    public function actionGetCode($tel = 0){
+        $model = new Member();
+        $model->tel = $tel;
+        $model->validate('tel');
+        if($tel !== 0 && empty($model->getErrors('tel'))){
+            //发送短信
+            $code = rand(1000,9999);
+            $res = \Yii::$app->sms->setPhoneNumbers($tel)->setTemplateParam(['code'=>$code])->send();
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1');
+            $redis->set('code_'.$tel,$code);
+            $rtn=[
+                'status'=>true,
+                'msg'=>'已发送短信至'.$tel.',请查收',
+            ];
+        }else{
+            $rtn = [
+                'status'=>false,
+                'msg'=>implode('/',$model->getErrors('tel')),
+            ];
+        }
+        echo json_encode($rtn);
+    }
+public function actionAa(){
+    echo phpinfo();
+}
 
 }
 
