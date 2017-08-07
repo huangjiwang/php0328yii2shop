@@ -90,7 +90,7 @@
 	</table>
 	<div class="cart_btn w990 bc mt10">
 		<a href="" class="continue">继续购物</a>
-		<a href="http://www.yii2.com:8080/index.php?r=home/order" class="checkout">算结 </a>
+		<a href="index.php?r=home/order" class="checkout">算结 </a>
 	</div>
 </div>
 <!-- 主体部分 end -->

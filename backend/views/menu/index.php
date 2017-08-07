@@ -30,4 +30,3 @@
             <?php endforeach?>
         <?php endforeach?>
     </table>
-<?php

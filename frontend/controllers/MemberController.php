@@ -76,7 +76,7 @@ class MemberController extends Controller{
 
                    }
                }    //跳转到试图
-               return $this->redirect('http://www.yii2.com:8080/index.php?r=home/index');
+               return $this->redirect(['home/index']);
            }else{
               var_dump($model->getErrors());exit;
            }

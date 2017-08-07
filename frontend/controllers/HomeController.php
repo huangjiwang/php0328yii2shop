@@ -22,11 +22,13 @@ class HomeController extends Controller{
     //前台首页
     public function actionIndex(){
 
-        if(\Yii::$app->user->isGuest==false){
-            return $this->redirect(['home/goods-category']);
-        }else{
-            return $this->redirect(['member/login']);
-        }
+        return $this->redirect(['home/goods-category']);
+
+//        if(\Yii::$app->user->isGuest==false){
+//            return $this->redirect(['home/goods-category']);
+//        }else{
+//            return $this->redirect(['member/login']);
+//        }
 
 
     }
