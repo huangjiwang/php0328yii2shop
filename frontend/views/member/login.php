@@ -94,7 +94,7 @@
 				<h3>还不是商城用户</h3>
 				<p>现在免费注册成为商城用户，便能立刻享受便宜又放心的购物乐趣，心动不如行动，赶紧加入吧!</p>
 
-				<a href="http://www.yii2.com:8080/index.php?r=member/regist" class="reg_btn">免费注册 >></a>
+				<a href="index.php?r=member/regist" class="reg_btn">免费注册 >></a>
 			</div>
 
 		</div>
