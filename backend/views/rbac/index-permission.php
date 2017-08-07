@@ -18,4 +18,3 @@
             </tr>
         <?php endforeach?>
     </table>
-<?php
