@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use frontend\components\SphinxClient;
 use frontend\models\Address;
 use frontend\models\Cart;
 use frontend\models\Goods;
@@ -9,6 +10,7 @@ use frontend\models\GoodsGallery;
 use frontend\models\GoodsIntro;
 use frontend\models\Order;
 use frontend\models\OrderGoods;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Cookie;
 use Yii;
@@ -55,11 +57,6 @@ class HomeController extends Controller{
         $model2=Goods::findOne(['id'=>$id]);
         //查询出商品相册信息
         $model3=GoodsGallery::find()->where(['goods_id'=>$id])->all();
-        //接收参数并验证
-//        if($model->load(\Yii::$app->request->post()) && $model->validate()) {
-//            var_dump($model);exit;
-//        }
-
         return $this->render('goods',['model'=>$model,'model2'=>$model2,'model3'=>$model3]);
     }
 
@@ -94,17 +91,23 @@ class HomeController extends Controller{
             $cookies->add($cookie);
         }else{
             //用户已登录，操作购物车数据表
-            $model=new Cart();
-            if($model->validate()){
-                $model->goods_id=$goods_id;
-                $model->amount=$amount;
-                $model->member_id=\Yii::$app->user->id;
-                $model->save();
-            }
-
+            $user_id = \Yii::$app->user->id;
+            $model=Cart::findOne(['goods_id'=>$goods_id,'member_id'=>$user_id]);
+                if($model){
+                    //购物车中已经有该商品，数量累加
+                    $model->amount += $amount;
+                    $model->save();
+                }else{
+                    //购物车中没有该商品
+                    $model=new Cart();
+                    if($model->validate()) {
+                        $model->amount = $amount;
+                        $model->goods_id = $goods_id;
+                        $model->member_id = \Yii::$app->user->id;
+                        $model->save();
+                    }
+                }
         }
-
-
         return $this->redirect(['cart']);
     }
     //购物车页面
@@ -302,4 +305,28 @@ class HomeController extends Controller{
         $model->status=0;
         $model->save();
     }
+
+    //测试coreseek搜索
+    public function actionTest($matches)
+    {
+        $cl = new SphinxClient();
+        $cl->SetServer ( '127.0.0.1', 9312);
+        $cl->SetArrayResult ( true );
+        $cl->SetMatchMode ( SPH_MATCH_ANY);
+        $cl->SetLimits(0, 1000);
+        $info = "$matches";
+        $res = $cl->Query($info, 'goods');
+
+        if(isset($res['matches'])){
+            if(isset($res['matches'])){
+                $ids = ArrayHelper::getColumn($res['matches'],'id');
+                $query=Goods::find()->where(['in','id',$ids])->all();
+                return $this->render('list',['model'=>$query]);
+            }else{
+                $query=Goods::find()->where(['id'=>0])->all();
+                return;
+            }
+        }
+    }
+
 }
